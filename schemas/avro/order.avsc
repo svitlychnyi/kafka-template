@@ -1,0 +1,51 @@
+{
+  "type": "record",
+  "name": "OrderEvent",
+  "namespace": "com.spring.kafka.avro.generated.order",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "eventType",
+      "type": "string"
+    },
+    {
+      "name": "eventTimestamp",
+      "type": "long",
+      "logicalType": "timestamp-micros"
+    },
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "user",
+      "type": "com.spring.kafka.avro.generated.user.UserEvent"
+    },
+    {
+      "name": "product",
+      "type": "string"
+    },
+    {
+      "name": "price",
+      "type": "double"
+    },
+    {
+      "name": "createdOn",
+      "type": "long",
+      "logicalType": "timestamp-micros"
+    },
+    {
+      "name": "updatedOn",
+      "type": "long",
+      "logicalType": "timestamp-micros"
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "default": true
+    }
+  ]
+}
