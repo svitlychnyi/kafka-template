@@ -1,12 +1,8 @@
 server:
-  port: 9081
+  port: 9083
 
 spring:
   cloud:
-    function:
-      definition: users;orders
-    schema-registry-client:
-      endpoint: http://${SCHEMA_REGISTRY_HOST:localhost}:${SCHEMA_REGISTRY_PORT:8081}
     stream:
       kafka:
         binder:
@@ -15,20 +11,12 @@ spring:
           min-partition-count: 3    # /
       bindings:
         users-in-0:
-          destination: com.spring.kafka.avro.newuser
-          content-type: application/*+avro
+          destination: com.spring.kafka.plain.newuser
+          content-type: application/json
           group: eventServiceGroup
           consumer:
             use-native-encoding: true
             ack-mode: RECORD # setting it explicitly as suggest in https://githubmemory.com/repo/spring-cloud/spring-cloud-stream-binder-kafka/issues/1079
-        orders-in-0:
-          destination: com.spring.kafka.avro.neworder
-          content-type: application/*+avro
-          group: eventServiceGroup
-          consumer:
-            use-native-encoding: true
-            ack-mode: RECORD # setting it explicitly as suggest in https://githubmemory.com/repo/spring-cloud/spring-cloud-stream-binder-kafka/issues/1079
-
 
 management:
   endpoints:

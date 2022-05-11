@@ -1,0 +1,26 @@
+server:
+  port: 9084
+
+spring:
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29091},${KAFKA_HOST:localhost}:${KAFKA_PORT:29092},${KAFKA_HOST:localhost}:${KAFKA_PORT:29093}
+          auto-add-partitions: true # (*) both user-service and event-service can create topic and add partitions
+      source: users
+      bindings:
+        users-out-0:
+          destination: com.spring.kafka.plain.newuser
+          content-type: application/json
+          producer:
+            partition-count: 3 # (*)
+            #use-native-encoding: true
+
+management:
+  endpoints:
+    web:
+      exposure.include: beans, env, health, info, metrics, mappings
+  endpoint:
+    health:
+      show-details: always

@@ -18,18 +18,20 @@ It also has a goal of showing the way of integration and working with avro schem
 ``` shell
 $ mvn install
 
-$ docker-compose up -d
+$ docker-compose up -d --build
 $ docker-compose ps
-          Name                         Command                       State                                   Ports                        
-------------------------------------------------------------------------------------------------------------------------------------------
-app-avro-consumer           java -jar /avro-consumer.jar     Up                                                                           
-app-avro-producer           java -jar /avro-producer.jar     Up                                                                           
-confluent-connect           /etc/confluent/docker/run        Up (health: starting)   0.0.0.0:8082->8082/tcp, 8083/tcp, 9092/tcp           
-confluent-schema-registry   /etc/confluent/docker/run        Up (health: starting)   0.0.0.0:28081->28081/tcp, 8081/tcp                   
-kafka-01                    /opt/bitnami/scripts/kafka ...   Up                      9092/tcp, 0.0.0.0:29091->9093/tcp                    
-kafka-02                    /opt/bitnami/scripts/kafka ...   Up                      9092/tcp, 0.0.0.0:29092->9093/tcp                    
-kafka-03                    /opt/bitnami/scripts/kafka ...   Up                      9092/tcp, 0.0.0.0:29093->9093/tcp                    
-zookeeper-01                /opt/bitnami/scripts/zooke ...   Up                      0.0.0.0:60215->2181/tcp, 2888/tcp, 3888/tcp, 8080/tcp
+          Name                         Command                   State                                Ports                        
+-----------------------------------------------------------------------------------------------------------------------------------
+app-avro-consumer           java -jar /avro-consumer.jar     Up                                                                    
+app-avro-producer           java -jar /avro-producer.jar     Up                                                                    
+app-plain-consumer          java -jar /plain-consumer.jar    Up                                                                    
+app-plain-producer          java -jar /plain-producer.jar    Up                                                                    
+confluent-connect           /etc/confluent/docker/run        Up (unhealthy)   0.0.0.0:8082->8082/tcp, 8083/tcp, 9092/tcp           
+confluent-schema-registry   /etc/confluent/docker/run        Up (healthy)     0.0.0.0:28081->28081/tcp, 8081/tcp                   
+kafka-01                    /opt/bitnami/scripts/kafka ...   Up               9092/tcp, 0.0.0.0:29091->9093/tcp                    
+kafka-02                    /opt/bitnami/scripts/kafka ...   Up               9092/tcp, 0.0.0.0:29092->9093/tcp                    
+kafka-03                    /opt/bitnami/scripts/kafka ...   Up               9092/tcp, 0.0.0.0:29093->9093/tcp                    
+zookeeper-01                /opt/bitnami/scripts/zooke ...   Up               0.0.0.0:60660->2181/tcp, 2888/tcp, 3888/tcp, 8080/tcp
 
 $ docker-compose logs -f avro-consumer
 ---
@@ -39,10 +41,10 @@ Payload: {"eventId": "8ace1b1b-1e0e-48b5-9a0e-dd9564605ba0", "eventType": "CREAT
 ---
 ```
 
-### Start Producer Manually
+### Start Avro Producer Manually
 Navigate to avro-producer and run `AvroProducerApplication.java as Java Application`. The producer starts and will publish messages every 15 seconds.
 
-### Start Consumer Manually
+### Start Avro Consumer Manually
 Navigate to avro-consumer and run `AvroConsumerApplication.java as Java Application`. The application will consume application.
 
 ### Refs

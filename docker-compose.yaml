@@ -130,5 +130,27 @@ services:
     networks:
       - kafka-template-network
 
+  plain-producer:
+    container_name: app-plain-producer
+    depends_on:
+      - kafka-01
+    build:
+      context: plain-producer
+      dockerfile: Dockerfile
+    image: plain-producer:latest
+    networks:
+      - kafka-template-network
+
+  plain-consumer:
+    container_name: app-plain-consumer
+    depends_on:
+      - kafka-01
+    build:
+      context: plain-consumer
+      dockerfile: Dockerfile
+    image: plain-consumer:latest
+    networks:
+      - kafka-template-network
+
 networks:
   kafka-template-network:
