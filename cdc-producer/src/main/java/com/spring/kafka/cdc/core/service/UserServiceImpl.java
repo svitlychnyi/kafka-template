@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(final User user) {
-//        Assert.isNotNull(user, "user");
+        Assert.notNull(user, "user");
         return userRepository.save(user);
     }
 }

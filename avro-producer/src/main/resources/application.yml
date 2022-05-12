@@ -9,7 +9,7 @@ spring:
         - classpath:avro/order.avsc
   cloud:
     schema-registry-client:
-      endpoint: http://${SCHEMA_REGISTRY_HOST:localhost}:${SCHEMA_REGISTRY_PORT:8081}
+      endpoint: http://${SCHEMA_REGISTRY_HOST:localhost}:${SCHEMA_REGISTRY_PORT:28081}
     stream:
       kafka:
         binder:

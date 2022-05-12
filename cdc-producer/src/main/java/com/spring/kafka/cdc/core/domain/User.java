@@ -14,18 +14,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@ToString
 public class User {
 
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
-    @SequenceGenerator(name = "user_generator", sequenceName = "user_seq", allocationSize = 1)
+    @SequenceGenerator(name = "user_generator", sequenceName = "user_seq", allocationSize = 1000)
     @Column(name = "id")
     private Long id;
 

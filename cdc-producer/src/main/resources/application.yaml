@@ -1,6 +1,5 @@
 spring:
   datasource:
-    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}/${POSTGRES_DATABASE:kafka_template}?autoReconnect=true
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
@@ -8,3 +7,10 @@ spring:
   liquibase:
     changeLog: classpath:db/master-change-log.xml
     drop-first: false
+
+  jpa:
+    properties:
+      hibernate.generate_statistics: false
+      hibernate.session.events.log: false
+      hibernate.show_sql: false
+      hibernate.format_sql: false
