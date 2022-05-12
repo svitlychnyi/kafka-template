@@ -49,15 +49,11 @@ Navigate to avro-consumer and run `AvroConsumerApplication.java as Java Applicat
 
 ### Refs
 
-#### General 
-* https://www.reddit.com/r/apachekafka/comments/tsr9dx/docker_compose_file_for_kafka_and_kafka_connect/
-* https://www.reddit.com/r/apachekafka/comments/tsr9dx/docker_compose_file_for_kafka_and_kafka_connect/
-* https://docs.bitnami.com/tutorials/build-messaging-cluster-apache-kafka-mongodb-kubernetes/
-* https://github.com/bitnami/bitnami-docker-kafka
-
 #### Kafka
-* https://hub.docker.com/r/bitnami/kafka/
-* https://www.baeldung.com/ops/kafka-docker-setup
+* [Apache Kafka packaged by Bitnami on DockerHub](https://hub.docker.com/r/bitnami/kafka/)
+* [Guide to Setting Up Apache Kafka Using Docker](https://www.baeldung.com/ops/kafka-docker-setup)
+* [Build a Scalable, Fault-Tolerant Messaging Cluster on Kubernetes with Apache Kafka and MongoDB](https://docs.bitnami.com/tutorials/build-messaging-cluster-apache-kafka-mongodb-kubernetes/)
 
 #### Confluent Stack
-* https://docs.confluent.io/platform/current/installation/docker/config-reference.html
+* [Docker Configuration Parameters](https://docs.confluent.io/platform/current/installation/docker/config-reference.html)
+* [Docker Compose file for Kafka and Kafka Connect (and ZooKeeper)](https://www.reddit.com/r/apachekafka/comments/tsr9dx/docker_compose_file_for_kafka_and_kafka_connect)

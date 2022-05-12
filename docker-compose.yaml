@@ -67,7 +67,7 @@ services:
 
   confluent-schema-registry:
     container_name: confluent-schema-registry
-    image: confluentinc/cp-schema-registry:6.1.1
+    image: confluentinc/cp-schema-registry:6.2.4
     depends_on:
       - kafka-01
     networks:
@@ -82,6 +82,23 @@ services:
       test: "curl -f http://confluent-schema-registry:8081 || exit 1"
       start_period: 1m
 
+  confluent-schema-registry-ui:
+    container_name: confluent-schema-registry-ui
+    image: landoop/schema-registry-ui:0.9.5
+    depends_on:
+      - kafka-01
+      - confluent-schema-registry
+    networks:
+      - kafka-template-network
+    ports:
+      - "28082:8000"
+    environment:
+      - SCHEMAREGISTRY_URL=http://confluent-schema-registry:8081
+      - PROXY=true
+    healthcheck:
+      test: "wget --quiet --tries=1 --spider http://confluent-schema-registry-ui:8000 || exit 1"
+      start_period: 30s
+
   confluent-connect:
     container_name: confluent-connect
     image: confluentinc/cp-kafka-connect
@@ -89,6 +106,7 @@ services:
       - kafka-01
       - kafka-02
       - kafka-03
+      - confluent-schema-registry
     networks:
       - kafka-template-network
     ports:
@@ -99,8 +117,10 @@ services:
       - CONNECT_CONFIG_STORAGE_TOPIC=_kafka-connect-config
       - CONNECT_OFFSET_STORAGE_TOPIC=_kafka-connect-offsets
       - CONNECT_STATUS_STORAGE_TOPIC=_kafka-connect-status
-      - CONNECT_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
-      - CONNECT_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://confluent-schema-registry:8081
+      - CONNECT_VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://confluent-schema-registry:8081
       - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_REST_ADVERTISED_HOST_NAME=localhost
