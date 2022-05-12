@@ -28,5 +28,4 @@ public class UserOutputStream {
 		userService.saveUser(user);
 		log.info("User Saved to DB: {}", user);
 	}
-
 }

@@ -47,7 +47,21 @@ Navigate to avro-producer and run `AvroProducerApplication.java as Java Applicat
 ### Start Avro Consumer Manually
 Navigate to avro-consumer and run `AvroConsumerApplication.java as Java Application`. The application will consume application.
 
+### Feed CDC events to Kafka
+```shell
+http://localhost:28085/connector-plugins
+http://localhost:28085/connectors/
+
+curl -X POST -H "Accept:application/json" -H "Content-Type: application/json" \
+      --data @cdc-producer/postgres-source.json http://localhost:28085/connectors
+      
+curl -H "Accept:application/json" localhost:28085/connectors/      
+
+curl -X DELETE http://localhost:28085/connectors/postgres-source
+```
+
 ### Refs
+* [Debezium PostgreSQL Connector](https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/1.9.2.Final/debezium-connector-postgres-1.9.2.Final-plugin.tar.gz)
 
 #### Kafka
 * [Apache Kafka packaged by Bitnami on DockerHub](https://hub.docker.com/r/bitnami/kafka/)
@@ -57,3 +71,4 @@ Navigate to avro-consumer and run `AvroConsumerApplication.java as Java Applicat
 #### Confluent Stack
 * [Docker Configuration Parameters](https://docs.confluent.io/platform/current/installation/docker/config-reference.html)
 * [Docker Compose file for Kafka and Kafka Connect (and ZooKeeper)](https://www.reddit.com/r/apachekafka/comments/tsr9dx/docker_compose_file_for_kafka_and_kafka_connect)
+* [postgres-kafka-demo](https://github.com/mtpatter/postgres-kafka-demo)

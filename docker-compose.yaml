@@ -152,7 +152,7 @@ services:
     networks:
       - kafka-template-network
     ports:
-      - "8082:8082"
+      - "28085:8083"
     environment:
       - CONNECT_BOOTSTRAP_SERVERS=kafka-01:9092,kafka-02:9092,kafka-03:9092
       - CONNECT_GROUP_ID=kafka-connect-group
@@ -165,8 +165,10 @@ services:
       - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://confluent-schema-registry:8081
       - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
-      - CONNECT_REST_ADVERTISED_HOST_NAME=localhost
-      - CONNECT_PLUGIN_PATH=/usr/share/java
+      - CONNECT_REST_ADVERTISED_HOST_NAME=0.0.0.0
+      - CONNECT_PLUGIN_PATH=/usr/share/java,/usr/share/kafka-connect-plugins
+    volumes:
+      - ./cdc-producer/kafka-connect-plugins:/usr/share/kafka-connect-plugins
 
   avro-producer:
     container_name: app-avro-producer
@@ -225,14 +227,18 @@ services:
   app-postgres:
     container_name: app-postgres
     image: postgres:14.1-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=kafka_template
     networks:
       - kafka-template-network
     ports:
       - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=kafka_template
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
     volumes:
       - db:/var/lib/postgresql/data
 
