@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}/${POSTGRES_DATABASE:kafka_template}?autoReconnect=true
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+
+  liquibase:
+    changeLog: classpath:db/master-change-log.xml
+    drop-first: false

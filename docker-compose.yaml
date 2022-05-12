@@ -28,6 +28,7 @@ services:
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-01:9092,EXTERNAL://localhost:29091
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
 
   kafka-02:
     container_name: kafka-02
@@ -46,6 +47,7 @@ services:
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-02:9092,EXTERNAL://localhost:29092
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
 
   kafka-03:
     container_name: kafka-03
@@ -64,12 +66,15 @@ services:
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-03:9092,EXTERNAL://localhost:29093
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
 
   confluent-schema-registry:
     container_name: confluent-schema-registry
     image: confluentinc/cp-schema-registry:6.2.4
     depends_on:
       - kafka-01
+      - kafka-02
+      - kafka-03
     networks:
       - kafka-template-network
     ports:
@@ -86,7 +91,6 @@ services:
     container_name: confluent-schema-registry-ui
     image: landoop/schema-registry-ui:0.9.5
     depends_on:
-      - kafka-01
       - confluent-schema-registry
     networks:
       - kafka-template-network
@@ -103,8 +107,9 @@ services:
     container_name: kafka-rest-proxy
     image: confluentinc/cp-kafka-rest:6.1.1
     depends_on:
-      - zookeeper-01
       - kafka-01
+      - kafka-02
+      - kafka-03
       - confluent-schema-registry
     networks:
       - kafka-template-network
@@ -124,7 +129,6 @@ services:
     container_name: confluent-kafka-topics-ui
     image: landoop/kafka-topics-ui:0.9.4
     depends_on:
-      - kafka-01
       - confluent-kafka-rest-proxy
     networks:
       - kafka-template-network
@@ -168,6 +172,8 @@ services:
     container_name: app-avro-producer
     depends_on:
       - kafka-01
+      - kafka-02
+      - kafka-03
       - confluent-schema-registry
     build:
       context: avro-producer
@@ -180,6 +186,8 @@ services:
     container_name: app-avro-consumer
     depends_on:
       - kafka-01
+      - kafka-02
+      - kafka-03
       - confluent-schema-registry
     build:
       context: avro-consumer
@@ -192,6 +200,8 @@ services:
     container_name: app-plain-producer
     depends_on:
       - kafka-01
+      - kafka-02
+      - kafka-03
     build:
       context: plain-producer
       dockerfile: Dockerfile
@@ -203,6 +213,8 @@ services:
     container_name: app-plain-consumer
     depends_on:
       - kafka-01
+      - kafka-02
+      - kafka-03
     build:
       context: plain-consumer
       dockerfile: Dockerfile
@@ -210,5 +222,23 @@ services:
     networks:
       - kafka-template-network
 
+  app-postgres:
+    container_name: app-postgres
+    image: postgres:14.1-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=kafka_template
+    networks:
+      - kafka-template-network
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+
 networks:
   kafka-template-network:
+
+volumes:
+  db:
+    driver: local
