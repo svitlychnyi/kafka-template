@@ -6,7 +6,7 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29091},${KAFKA_HOST:localhost}:${KAFKA_PORT:29092},${KAFKA_HOST:localhost}:${KAFKA_PORT:29093}
+          brokers: ${BOOTSTRAP_SERVERS:localhost:29091,localhost:29092,localhost:29093}
           auto-add-partitions: true # (*) both user-service and event-service can create topic and add partitions
       source: users
       bindings:

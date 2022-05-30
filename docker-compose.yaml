@@ -2,7 +2,7 @@ version: "3.8"
 services:
   zookeeper-01:
     container_name: zookeeper-01
-    image: 'bitnami/zookeeper:latest'
+    image: '${REGISTRY}bitnami/zookeeper:latest'
     networks:
       - kafka-template-network
     ports:
@@ -13,7 +13,7 @@ services:
 
   kafka-01:
     container_name: kafka-01
-    image: 'bitnami/kafka:3.0.0'
+    image: '${REGISTRY}bitnami/kafka:3.0.0'
     depends_on:
       - zookeeper-01
     networks:
@@ -23,7 +23,7 @@ services:
     environment:
       - KAFKA_BROKER_ID=201
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-01:2181
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER}
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-01:9092,EXTERNAL://localhost:29091
@@ -32,7 +32,7 @@ services:
 
   kafka-02:
     container_name: kafka-02
-    image: 'bitnami/kafka:3.0.0'
+    image: '${REGISTRY}bitnami/kafka:3.0.0'
     depends_on:
       - zookeeper-01
     networks:
@@ -42,7 +42,7 @@ services:
     environment:
       - KAFKA_BROKER_ID=202
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-01:2181
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER}
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-02:9092,EXTERNAL://localhost:29092
@@ -51,7 +51,7 @@ services:
 
   kafka-03:
     container_name: kafka-03
-    image: 'bitnami/kafka:3.0.0'
+    image: '${REGISTRY}bitnami/kafka:3.0.0'
     depends_on:
       - zookeeper-01
     networks:
@@ -61,7 +61,7 @@ services:
     environment:
       - KAFKA_BROKER_ID=203
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-01:2181
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER}
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-03:9092,EXTERNAL://localhost:29093
@@ -70,7 +70,7 @@ services:
 
   confluent-schema-registry:
     container_name: confluent-schema-registry
-    image: confluentinc/cp-schema-registry:6.2.4
+    image: ${REGISTRY}confluentinc/cp-schema-registry:6.2.4
     depends_on:
       - kafka-01
       - kafka-02
@@ -80,16 +80,16 @@ services:
     ports:
       - "28081:28081"
     environment:
-      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka-01:9092,kafka-02:9092,kafka-03:9092
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
       - SCHEMA_REGISTRY_HOST_NAME=confluent-schema-registry
-      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:28081,http://confluent-schema-registry:8081
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:28081,${SCHEMA_REGISTRY}
     healthcheck:
       test: "curl -f http://confluent-schema-registry:8081 || exit 1"
       start_period: 1m
 
   confluent-schema-registry-ui:
     container_name: confluent-schema-registry-ui
-    image: landoop/schema-registry-ui:0.9.5
+    image: ${REGISTRY}landoop/schema-registry-ui:0.9.5
     depends_on:
       - confluent-schema-registry
     networks:
@@ -97,7 +97,7 @@ services:
     ports:
       - "28082:8000"
     environment:
-      - SCHEMAREGISTRY_URL=http://confluent-schema-registry:8081
+      - SCHEMAREGISTRY_URL=${SCHEMA_REGISTRY}
       - PROXY=true
     healthcheck:
       test: "wget --quiet --tries=1 --spider http://confluent-schema-registry-ui:8000 || exit 1"
@@ -105,7 +105,7 @@ services:
 
   confluent-kafka-rest-proxy:
     container_name: kafka-rest-proxy
-    image: confluentinc/cp-kafka-rest:6.1.1
+    image: ${REGISTRY}confluentinc/cp-kafka-rest:6.1.1
     depends_on:
       - kafka-01
       - kafka-02
@@ -116,10 +116,10 @@ services:
     ports:
       - "28083:8082"
     environment:
-      - KAFKA_REST_BOOTSTRAP_SERVERS=kafka-01:9092,kafka-02:9092,kafka-03:9092
+      - KAFKA_REST_BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
       - KAFKA_REST_HOST_NAME=confluent-kafka-rest-proxy
       - KAFKA_REST_LISTENERS=http://confluent-kafka-rest-proxy:8082
-      - KAFKA_REST_SCHEMA_REGISTRY_URL=http://confluent-schema-registry:8081
+      - KAFKA_REST_SCHEMA_REGISTRY_URL=${SCHEMA_REGISTRY}
       - KAFKA_REST_CONSUMER_REQUEST_TIMEOUT_MS=30000
     healthcheck:
       test: "curl -f http://confluent-kafka-rest-proxy:8082 || exit 1"
@@ -127,7 +127,7 @@ services:
 
   confluent-kafka-topics-ui:
     container_name: confluent-kafka-topics-ui
-    image: landoop/kafka-topics-ui:0.9.4
+    image: ${REGISTRY}landoop/kafka-topics-ui:0.9.4
     depends_on:
       - confluent-kafka-rest-proxy
     networks:
@@ -143,7 +143,7 @@ services:
 
   confluent-connect:
     container_name: confluent-connect
-    image: confluentinc/cp-kafka-connect
+    image: ${REGISTRY}confluentinc/cp-kafka-connect
     depends_on:
       - kafka-01
       - kafka-02
@@ -154,15 +154,15 @@ services:
     ports:
       - "28085:8083"
     environment:
-      - CONNECT_BOOTSTRAP_SERVERS=kafka-01:9092,kafka-02:9092,kafka-03:9092
+      - CONNECT_BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
       - CONNECT_GROUP_ID=kafka-connect-group
       - CONNECT_CONFIG_STORAGE_TOPIC=_kafka-connect-config
       - CONNECT_OFFSET_STORAGE_TOPIC=_kafka-connect-offsets
       - CONNECT_STATUS_STORAGE_TOPIC=_kafka-connect-status
       - CONNECT_KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
-      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://confluent-schema-registry:8081
+      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=${SCHEMA_REGISTRY}
       - CONNECT_VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
-      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://confluent-schema-registry:8081
+      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=${SCHEMA_REGISTRY}
       - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_REST_ADVERTISED_HOST_NAME=0.0.0.0
@@ -183,6 +183,9 @@ services:
     image: avro-producer:latest
     networks:
       - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+      - SCHEMA_REGISTRY=${SCHEMA_REGISTRY}
 
   avro-consumer:
     container_name: app-avro-consumer
@@ -197,6 +200,9 @@ services:
     image: avro-consumer:latest
     networks:
       - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+      - SCHEMA_REGISTRY=${SCHEMA_REGISTRY}
 
   plain-producer:
     container_name: app-plain-producer
@@ -210,6 +216,8 @@ services:
     image: plain-producer:latest
     networks:
       - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
 
   plain-consumer:
     container_name: app-plain-consumer
@@ -223,10 +231,12 @@ services:
     image: plain-consumer:latest
     networks:
       - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
 
   app-postgres:
     container_name: app-postgres
-    image: postgres:14.1-alpine
+    image: ${REGISTRY}postgres:14.1-alpine
     networks:
       - kafka-template-network
     ports:

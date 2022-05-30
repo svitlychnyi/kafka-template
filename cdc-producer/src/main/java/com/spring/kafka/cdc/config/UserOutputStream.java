@@ -15,11 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserOutputStream {
 
-	Faker faker = new Faker();
 	private final UserService userService;
 
 	@Scheduled(fixedDelay = 15000)
 	public void publishUserData() {
+		Faker faker = new Faker();
+
 		User user = User.builder()
 			.firstName(faker.name().firstName())
 			.lastName(faker.name().lastName())

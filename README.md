@@ -15,6 +15,9 @@ It also has a goal of showing the way of integration and working with avro schem
 
 
 ### Setup infrastructure together with consumer/producer
+TODO: Describe avro models creation via avro-maven-plugin
+TODO: Search where the binding happens "users-in-0":
+
 ``` shell
 $ mvn install
 
