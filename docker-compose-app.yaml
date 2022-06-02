@@ -1,0 +1,72 @@
+version: "3.8"
+services:
+  avro-producer:
+    container_name: app-avro-producer
+    build:
+      context: avro-producer
+      dockerfile: Dockerfile
+    image: avro-producer:latest
+    networks:
+      - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+      - SCHEMA_REGISTRY=${SCHEMA_REGISTRY}
+
+  avro-consumer:
+    container_name: app-avro-consumer
+    build:
+      context: avro-consumer
+      dockerfile: Dockerfile
+    image: avro-consumer:latest
+    networks:
+      - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+      - SCHEMA_REGISTRY=${SCHEMA_REGISTRY}
+
+  plain-producer:
+    container_name: app-plain-producer
+    build:
+      context: plain-producer
+      dockerfile: Dockerfile
+    image: plain-producer:latest
+    networks:
+      - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+
+  plain-consumer:
+    container_name: app-plain-consumer
+    build:
+      context: plain-consumer
+      dockerfile: Dockerfile
+    image: plain-consumer:latest
+    networks:
+      - kafka-template-network
+    environment:
+      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+
+  app-postgres:
+    container_name: app-postgres
+    image: ${REGISTRY}postgres:14.1-alpine
+    networks:
+      - kafka-template-network
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=kafka_template
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+networks:
+  kafka-template-network:
+
+volumes:
+  db:
+    driver: local
