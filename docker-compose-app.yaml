@@ -2,6 +2,7 @@ version: "3.8"
 services:
   avro-producer:
     container_name: app-avro-producer
+    platform: linux/x86_64
     build:
       context: avro-producer
       dockerfile: Dockerfile
@@ -14,6 +15,7 @@ services:
 
   avro-consumer:
     container_name: app-avro-consumer
+    platform: linux/x86_64
     build:
       context: avro-consumer
       dockerfile: Dockerfile
@@ -26,6 +28,7 @@ services:
 
   plain-producer:
     container_name: app-plain-producer
+    platform: linux/x86_64
     build:
       context: plain-producer
       dockerfile: Dockerfile
@@ -37,6 +40,7 @@ services:
 
   plain-consumer:
     container_name: app-plain-consumer
+    platform: linux/x86_64
     build:
       context: plain-consumer
       dockerfile: Dockerfile
@@ -48,6 +52,7 @@ services:
 
   app-postgres:
     container_name: app-postgres
+    platform: linux/x86_64
     image: ${REGISTRY}postgres:14.1-alpine
     networks:
       - kafka-template-network

@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   zookeeper-01:
+    platform: linux/x86_64
     container_name: zookeeper-01
     image: '${REGISTRY}bitnami/zookeeper:latest'
     networks:
@@ -13,6 +14,7 @@ services:
 
   kafka-01:
     container_name: kafka-01
+    platform: linux/x86_64
     image: '${REGISTRY}bitnami/kafka:3.0.0'
     depends_on:
       - zookeeper-01
@@ -32,6 +34,7 @@ services:
 
   kafka-02:
     container_name: kafka-02
+    platform: linux/x86_64
     image: '${REGISTRY}bitnami/kafka:3.0.0'
     depends_on:
       - zookeeper-01
@@ -51,6 +54,7 @@ services:
 
   kafka-03:
     container_name: kafka-03
+    platform: linux/x86_64
     image: '${REGISTRY}bitnami/kafka:3.0.0'
     depends_on:
       - zookeeper-01
@@ -70,6 +74,7 @@ services:
 
   confluent-schema-registry:
     container_name: confluent-schema-registry
+    platform: linux/x86_64
     image: ${REGISTRY}confluentinc/cp-schema-registry:6.2.4
     depends_on:
       - kafka-01
@@ -89,6 +94,7 @@ services:
 
   confluent-schema-registry-ui:
     container_name: confluent-schema-registry-ui
+    platform: linux/x86_64
     image: ${REGISTRY}landoop/schema-registry-ui:0.9.5
     depends_on:
       - confluent-schema-registry
@@ -105,6 +111,7 @@ services:
 
   confluent-kafka-rest-proxy:
     container_name: kafka-rest-proxy
+    platform: linux/x86_64
     image: ${REGISTRY}confluentinc/cp-kafka-rest:6.1.1
     depends_on:
       - kafka-01
@@ -127,6 +134,7 @@ services:
 
   confluent-kafka-topics-ui:
     container_name: confluent-kafka-topics-ui
+    platform: linux/x86_64
     image: ${REGISTRY}landoop/kafka-topics-ui:0.9.4
     depends_on:
       - confluent-kafka-rest-proxy
@@ -143,6 +151,7 @@ services:
 
   confluent-connect:
     container_name: confluent-connect
+    platform: linux/x86_64
     image: ${REGISTRY}confluentinc/cp-kafka-connect
     depends_on:
       - kafka-01
@@ -172,6 +181,7 @@ services:
 
   avro-producer:
     container_name: app-avro-producer
+    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -189,6 +199,7 @@ services:
 
   avro-consumer:
     container_name: app-avro-consumer
+    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -206,6 +217,7 @@ services:
 
   plain-producer:
     container_name: app-plain-producer
+    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -221,6 +233,7 @@ services:
 
   plain-consumer:
     container_name: app-plain-consumer
+    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -236,6 +249,7 @@ services:
 
   app-postgres:
     container_name: app-postgres
+    platform: linux/x86_64
     image: ${REGISTRY}postgres:14.1-alpine
     networks:
       - kafka-template-network
