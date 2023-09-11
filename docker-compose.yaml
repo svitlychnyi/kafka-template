@@ -1,9 +1,8 @@
 version: "3.8"
 services:
   zookeeper-01:
-    platform: linux/x86_64
     container_name: zookeeper-01
-    image: '${REGISTRY}bitnami/zookeeper:latest'
+    image: '${REGISTRY}confluentinc/cp-zookeeper:latest'
     networks:
       - kafka-template-network
     ports:
@@ -11,11 +10,11 @@ services:
     environment:
       - ZOO_SERVER_ID=101
       - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOOKEEPER_CLIENT_PORT=2181
 
   kafka-01:
     container_name: kafka-01
-    platform: linux/x86_64
-    image: '${REGISTRY}bitnami/kafka:3.0.0'
+    image: '${REGISTRY}confluentinc/cp-kafka:latest'
     depends_on:
       - zookeeper-01
     networks:
@@ -25,17 +24,16 @@ services:
     environment:
       - KAFKA_BROKER_ID=201
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER}
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-01:9092,EXTERNAL://localhost:29091
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
-      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER}
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_ADVERTISED_LISTENERS=CLIENT://kafka-01:9092,EXTERNAL://localhost:29091
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
 
   kafka-02:
     container_name: kafka-02
-    platform: linux/x86_64
-    image: '${REGISTRY}bitnami/kafka:3.0.0'
+    image: '${REGISTRY}confluentinc/cp-kafka:latest'
     depends_on:
       - zookeeper-01
     networks:
@@ -45,17 +43,16 @@ services:
     environment:
       - KAFKA_BROKER_ID=202
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER}
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-02:9092,EXTERNAL://localhost:29092
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
-      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER}
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_ADVERTISED_LISTENERS=CLIENT://kafka-02:9092,EXTERNAL://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
 
   kafka-03:
     container_name: kafka-03
-    platform: linux/x86_64
-    image: '${REGISTRY}bitnami/kafka:3.0.0'
+    image: '${REGISTRY}confluentinc/cp-kafka:latest'
     depends_on:
       - zookeeper-01
     networks:
@@ -65,17 +62,16 @@ services:
     environment:
       - KAFKA_BROKER_ID=203
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=${ZOOKEEPER}
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-03:9092,EXTERNAL://localhost:29093
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
-      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER}
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_ADVERTISED_LISTENERS=CLIENT://kafka-03:9092,EXTERNAL://localhost:29093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
 
   confluent-schema-registry:
     container_name: confluent-schema-registry
-    platform: linux/x86_64
-    image: ${REGISTRY}confluentinc/cp-schema-registry:6.2.4
+    image: ${REGISTRY}confluentinc/cp-schema-registry:latest
     depends_on:
       - kafka-01
       - kafka-02
@@ -92,27 +88,25 @@ services:
       test: "curl -f http://confluent-schema-registry:8081 || exit 1"
       start_period: 1m
 
-  confluent-schema-registry-ui:
-    container_name: confluent-schema-registry-ui
-    platform: linux/x86_64
-    image: ${REGISTRY}landoop/schema-registry-ui:0.9.5
-    depends_on:
-      - confluent-schema-registry
-    networks:
-      - kafka-template-network
-    ports:
-      - "28082:8000"
-    environment:
-      - SCHEMAREGISTRY_URL=${SCHEMA_REGISTRY}
-      - PROXY=true
-    healthcheck:
-      test: "wget --quiet --tries=1 --spider http://confluent-schema-registry-ui:8000 || exit 1"
-      start_period: 30s
+#  confluent-schema-registry-ui:
+#    container_name: confluent-schema-registry-ui
+#    image: ${REGISTRY}landoop/schema-registry-ui:latest
+#    depends_on:
+#      - confluent-schema-registry
+#    networks:
+#      - kafka-template-network
+#    ports:
+#      - "28082:8000"
+#    environment:
+#      - SCHEMAREGISTRY_URL=${SCHEMA_REGISTRY}
+#      - PROXY=true
+#    healthcheck:
+#      test: "wget --quiet --tries=1 --spider http://confluent-schema-registry-ui:8000 || exit 1"
+#      start_period: 30s
 
   confluent-kafka-rest-proxy:
     container_name: kafka-rest-proxy
-    platform: linux/x86_64
-    image: ${REGISTRY}confluentinc/cp-kafka-rest:6.1.1
+    image: ${REGISTRY}confluentinc/cp-kafka-rest:latest
     depends_on:
       - kafka-01
       - kafka-02
@@ -132,26 +126,24 @@ services:
       test: "curl -f http://confluent-kafka-rest-proxy:8082 || exit 1"
       start_period: 30s
 
-  confluent-kafka-topics-ui:
-    container_name: confluent-kafka-topics-ui
-    platform: linux/x86_64
-    image: ${REGISTRY}landoop/kafka-topics-ui:0.9.4
-    depends_on:
-      - confluent-kafka-rest-proxy
-    networks:
-      - kafka-template-network
-    ports:
-      - "28084:8000"
-    environment:
-      - KAFKA_REST_PROXY_URL=http://confluent-kafka-rest-proxy:8082
-      - PROXY=true
-    healthcheck:
-      test: "wget --quiet --tries=1 --spider http://confluent-kafka-topics-ui:8000 || exit 1"
-      start_period: 30s
+#  confluent-kafka-topics-ui:
+#    container_name: confluent-kafka-topics-ui
+#    image: ${REGISTRY}confluentinc/kafka-topics-ui:latest
+#    depends_on:
+#      - confluent-kafka-rest-proxy
+#    networks:
+#      - kafka-template-network
+#    ports:
+#      - "28084:8000"
+#    environment:
+#      - KAFKA_REST_PROXY_URL=http://confluent-kafka-rest-proxy:8082
+#      - PROXY=true
+#    healthcheck:
+#      test: "wget --quiet --tries=1 --spider http://confluent-kafka-topics-ui:8000 || exit 1"
+#      start_period: 30s
 
   confluent-connect:
     container_name: confluent-connect
-    platform: linux/x86_64
     image: ${REGISTRY}confluentinc/cp-kafka-connect
     depends_on:
       - kafka-01
@@ -181,7 +173,6 @@ services:
 
   avro-producer:
     container_name: app-avro-producer
-    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -199,7 +190,6 @@ services:
 
   avro-consumer:
     container_name: app-avro-consumer
-    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -217,7 +207,6 @@ services:
 
   plain-producer:
     container_name: app-plain-producer
-    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -233,7 +222,6 @@ services:
 
   plain-consumer:
     container_name: app-plain-consumer
-    platform: linux/x86_64
     depends_on:
       - kafka-01
       - kafka-02
@@ -249,7 +237,6 @@ services:
 
   app-postgres:
     container_name: app-postgres
-    platform: linux/x86_64
     image: ${REGISTRY}postgres:14.1-alpine
     networks:
       - kafka-template-network
